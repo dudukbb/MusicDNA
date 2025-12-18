@@ -28,7 +28,7 @@
 # tempo                       : Şarkının tahmini temposu (BPM – dakikadaki vuruş sayısı)
 # duration_ms                 : Şarkı süresi (milisaniye cinsinden)
 #
-# ===================== DİL VE METAVERİ =====================
+# ===================== DİL =====================
 # language                    : Şarkı sözlerinin tespit edilen dili
 #
 # ========================================================================
@@ -198,4 +198,5 @@ correlation_matrix(df, num_cols)
 ################################################################
 # 3. BASE MODELS
 ################################################################
+
 
