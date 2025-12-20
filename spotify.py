@@ -466,19 +466,14 @@ else:
     print("\nDNA'nıza Uygun Tavsiyeler:")
     print(recommendations)
 
-import joblib
+from export_artifacts import export_artifacts
 
-# df_final, scaler, pca, kmeans, model_features, cluster_names hazır olduktan SONRA çalıştır:
-joblib.dump(
-    {
-        "df_final": df_final,
-        "scaler": scaler,
-        "pca": pca,
-        "kmeans": kmeans,
-        "model_features": model_features,
-        "cluster_names": cluster_names,
-    },
-    "musicdna_artifacts.joblib"
+export_artifacts(
+    df_final=df_final,
+    scaler=scaler,
+    pca=pca,
+    kmeans=kmeans,
+    model_features=model_features,
+    cluster_names=cluster_names,
+    out_path="musicdna_artifacts.joblib",
 )
-
-print("✅ Kaydedildi: musicdna_artifacts.joblib")
