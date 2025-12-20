@@ -1,11 +1,9 @@
-# Python
+# datasets & artifacts
+datasets/
+*.joblib
+
+# virtual env & ide
 .venv/
+.idea/
 __pycache__/
 *.pyc
-
-# IDE
-.idea/
-.vscode/
-
-# OS
-.DS_Store

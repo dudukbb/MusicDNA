@@ -45,9 +45,10 @@
 # bazi değişkenlerdeki NA'ler 0 oluyor buna dikkat
 
 import pandas as pd
+import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
-from nltk.cluster import kmeans
+#from nltk.cluster import kmeans
 from nrclex import NRCLex
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -80,7 +81,7 @@ def cat_summary(dataframe, col_name, plot=False):
                         "Ratio": 100 * dataframe[col_name].value_counts() / len(dataframe)}))
     print("##########################################")
     if plot:
-        sns.countplot(x=dataframe[col_name], data=dataframe)
+        sns.countplot(x=col_name, data=dataframe)
         plt.show(block=True)
 
 def num_summary(dataframe, numerical_col, plot=False):
@@ -102,25 +103,14 @@ def correlation_matrix(df, cols):
     plt.show(block=True)
 
 def grab_col_names(dataframe, cat_th=3, car_th=20):
-    # tipi Object olanlar
     cat_cols = [col for col in dataframe.columns if dataframe[col].dtypes == "O"]
-    # numeric görünümlü categoric ( sayısal gibi ama aslında categoric --> mode = {0,1}
     num_but_cat = [col for col in dataframe.columns if dataframe[col].nunique() < cat_th and
                    dataframe[col].dtypes != "O"]
-    # categoric ama cardinal
-    # categoric gibi ama çok fazla sınıfı var(cardinal)
-    cat_but_car = [col for col in dataframe.columns if dataframe[col].nunique() > car_th and
-                   dataframe[col].dtypes == "O"]
-    # tipi obejct + numeric görünümlü categoricler = gerçek categorics
+    cat_but_car = [col for col in cat_cols if dataframe[col].nunique() > car_th]
     cat_cols = cat_cols + num_but_cat
-    # categoriclerin içinden cat_but_carları çıkarıyoruz
-    # çünkü cat_but_car categoric görünümlü cardinal olduğu için çıkarmamız gerekiyor
-    # cat_but_car : gerçekten categoric değil, o cardinal
     cat_cols = [col for col in cat_cols if col not in cat_but_car]
 
-    # object olmayan tüm featurelar(kolonlar)
     num_cols = [col for col in dataframe.columns if dataframe[col].dtypes != "O"]
-    # numeric görünümlü categoricleri çıkarıyoruz = gerçek numericler
     num_cols = [col for col in num_cols if col not in num_but_cat]
 
     # cat_cols ile num_cols çakışmasın (numeric olanlar cat_cols'ta kalmasın)
@@ -138,7 +128,7 @@ def grab_col_names(dataframe, cat_th=3, car_th=20):
 # 1. Exploratory Data Analysis
 ################################################
 
-df = pd.read_csv("spotify_songs.csv")
+df = pd.read_csv("datasets/spotify_songs.csv")
 df.head()
 df.dtypes
 check_df(df,head=5)
@@ -168,8 +158,10 @@ num_cols = [col for col in num_cols if col not in ["track_popularity", "duration
 
 # key threshold=5 olayından dolayı
 # key -----> num görünümlü categoric
-num_cols.remove("key")
-num_but_cat.append("key")
+if "key" in num_cols:
+    num_cols.remove("key")
+if "key" not in num_but_cat:
+    num_but_cat.append("key")
 
 print(num_cols)
 print(cat_cols)
@@ -212,7 +204,7 @@ NRC_EMOTIONS = [
 ]
 
 # bir metin alınıp içindeki duygu yüklü kelimeleri sayıyoruz
-# bu sayıları toplan kelime sayısına bölüyoruz ( denom )
+# bu sayıları toplam kelime sayısına bölüyoruz ( denom )
 # NEDEN ? -uzun şarkılar(örneğin Rap) kısa şarkılardan daha fazla
 # duygu kelimesi içerebilir. Kelime sayısına bölerek(normalization)
 # her şarkının "duygu yoğunluğunu" ölçüyoruz.
@@ -233,8 +225,8 @@ def _normalize(s: str) -> str:
     return str(s).lower().strip()
 
 # kullanıcının yazdığı şarkı ismini _normalize fonksiyonuna göndererek temizler.
-# kullanıcının aradığı kelimeyi içeren tüm satırları bulur, ilgilim tüm şarkıları hits adındaki listeye alır
-# kullanıcı sanatçı adı da vermişse bulduğu sonuçları bu sanatçıya göre tekrar filtreler. Böylece doğru şarkıyı vulma ihtimali artar.
+# kullanıcının aradığı kelimeyi içeren tüm satırları bulur, ilgili tüm şarkıları hits adındaki listeye alır
+# kullanıcı sanatçı adı da vermişse bulduğu sonuçları bu sanatçıya göre tekrar filtreler. Böylece doğru şarkıyı bulma ihtimali artar.
 # eğer aynı isimde birden fazla kayıt varsa(mesela bir şarkının hem orijinali hem de remixi) en popülerden en az popülere göre sıralar.
 # sıralamanın en başındaki (.iloc[0]), yani en popüler olan satırı seçer ve bu şarkının tüm verilerini return eder.
 def find_song_row(df, track_name, track_artist=None):
@@ -260,8 +252,9 @@ df = df.drop_duplicates(subset=['track_id']).reset_index(drop=True)
 print("Adım 1: Lyrics Duygu Analizi yapılıyor ...")
 # apply ile her bir şarkı sözünü nrclex_features fonksiyonua gönderiyoruz.
 lyrics_results = df["lyrics"].apply(nrclex_features)
+
 # nrclex_features fonksiyonu her şarkı için bir dictionary döndürür.
-# bu sözlükleri tolist() ile listeye çevirip sonra bir df halien getiriyoruz.
+# bu sözlükleri tolist() ile listeye çevirip sonra bir df haline getiriyoruz.
 lyrics_feat_df = pd.DataFrame(lyrics_results.tolist())
 actual_lyrics_features = [c for c in lyrics_feat_df.columns if c.startswith("lyr_")]
 
@@ -272,10 +265,11 @@ df_final = pd.concat([df.reset_index(drop=True),
 
 # modele girecek olan tüm numeric sütunları tek bir listede topluyoruz
 model_features = audio_features + actual_lyrics_features
-check_df(df,head=5)
+check_df(df_final,head=5)
+
 
 # modelde kullanılacak numeric kolonları seçtik df içinden
-X = df_final[model_features]
+X = df_final[model_features].copy()
 
 # Standartlaştırma objesi
 scaler = StandardScaler()
@@ -283,6 +277,16 @@ scaler = StandardScaler()
 # verilere standartlaştırıyoruz ( avg=0, std=1 )
 # veriler aynı ölçekte olmalı, biri diğerini bastırmamalı
 X_scaled = scaler.fit_transform(X)
+
+
+#PCA (varyansın %90'ını koru)
+# n_components=0.90 -> "toplam varyansın %90'ını açıklayan bileşen sayısını otomatik seç"
+pca = PCA(n_components=0.90, random_state=42)
+X_pca = pca.fit_transform(X_scaled)
+
+print("Orijinal feature sayısı:", X.shape[1])
+print("PCA sonrası bileşen sayısı:", X_pca.shape[1])
+print("Açıklanan toplam varyans oranı:", pca.explained_variance_ratio_.sum())
 
 # ==========================================
 # 4. MODELLEME (K-MEANS & PCA)
@@ -293,7 +297,7 @@ K_range = range(2, 11)
 
 for k in K_range:
     km = KMeans(n_clusters=k, random_state=42, n_init=10)
-    km.fit(X_scaled)
+    km.fit(X_pca)
     ssd.append(km.inertia_)
 
 # Elbow Grafiği Görselleştirme
@@ -305,6 +309,12 @@ plt.title("İdeal Küme Sayısı İçin Dirsek Metodu (Elbow)")
 plt.grid(True)
 plt.show()
 
+best_k = 5  # senin seçtiğin k (elbow/silhouette'tan gelen)
+kmeans = KMeans(n_clusters=best_k, random_state=42, n_init=10)
+
+df_final["cluster"] = kmeans.fit_predict(X_pca)
+
+df_final["cluster"].value_counts()
 # ==========================================
 # 5. KİŞİLİK ANALİZİ VE İSİMLENDİRME
 # ==========================================
@@ -355,6 +365,8 @@ def name_cluster(z):
     if z["lyr_joy"] > 0.4 or z["lyr_positive"] > 0.4:
         if "Mutlu & Coşkulu" not in tags:
             tags.append("Pozitif Vibes")
+    if z["lyr_negative"] > 0.6 or z["lyr_anger"] > 0.6:
+        tags.append("Karanlık Sözler")
 
     # En belirgin ilk 2 etiketi birleştir, yoksa "Dengeli Karma" de
     return " + ".join(tags[:2]) if tags else "Dengeli / Karma"
@@ -371,51 +383,102 @@ print(df_final["cluster_name"].value_counts())
 # ==========================================
 # 6. GÖRSELLEŞTİRME (PCA 2D)
 # ==========================================
-pca2 = PCA(n_components=2, random_state=42)
-X_pca2 = pca2.fit_transform(X_scaled)
-df_final["pca1"], df_final["pca2"] = X_pca2[:, 0], X_pca2[:, 1]
-centroids_2d = pca2.transform(kmeans.cluster_centers_)
+# Modelde kullandığın PCA (0.90) zaten var: pca, X_pca
+# 2D için aynı uzaydan tekrar PCA (veya direkt ilk 2 bileşeni kullan)
+
+pca_viz = PCA(n_components=2, random_state=42)
+X_viz = pca_viz.fit_transform(X_pca)
+
+df_final["pca1"], df_final["pca2"] = X_viz[:, 0], X_viz[:, 1]
+centroids_2d = pca_viz.transform(kmeans.cluster_centers_)
 
 plt.figure(figsize=(12, 7))
-scatter = plt.scatter(df_final["pca1"], df_final["pca2"], c=df_final["cluster"], cmap='viridis', alpha=0.3)
-plt.scatter(centroids_2d[:, 0], centroids_2d[:, 1], marker="X", s=300, color='red')
+clusters = sorted(df_final["cluster"].unique())
+
+for cid in clusters:
+    sub = df_final[df_final["cluster"] == cid]
+    plt.scatter(sub["pca1"], sub["pca2"],
+                alpha=0.18, s=8,
+                label=f"{cid} - {cluster_names[cid]}")
+
+plt.scatter(centroids_2d[:, 0], centroids_2d[:, 1],
+            marker="X", s=260, c="black", label="Centroid")
 
 for i, (x, y) in enumerate(centroids_2d):
-    plt.text(x, y, f"Cluster {i}: {cluster_names[i]}", fontsize=9, fontweight="bold", backgroundcolor='white')
+    plt.text(x + 0.2, y + 0.2, f"{i}", fontsize=10, fontweight="bold",
+             bbox=dict(facecolor="white", alpha=0.85, edgecolor="none"))
 
-plt.title("MusicDNA Kümeleme Haritası")
+plt.title("MusicDNA Kümeleme Haritası (PCA 2D)")
+plt.xlabel("PCA-1")
+plt.ylabel("PCA-2")
+
+# outlier kırpma (sunumda çok iyi durur)
+plt.xlim(df_final["pca1"].quantile(0.01), df_final["pca1"].quantile(0.99))
+plt.ylim(df_final["pca2"].quantile(0.01), df_final["pca2"].quantile(0.99))
+
+plt.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=True)
+plt.tight_layout()
 plt.show()
 
 
 # ==========================================
 # 7. KULLANICI PROFİLLEME VE TAVSİYE
 # ==========================================
-def music_dna_engine(user_song_list):
+def music_dna_engine(user_song_list, df=df_final, top_n=5):
     found_rows = []
     for s in user_song_list:
-        row = find_song_row(df_final, s.get('name'), s.get('artist'))
-        if row is not None: found_rows.append(row)
+        row = find_song_row(df, s.get("name"), s.get("artist"))
+        if row is not None:
+            found_rows.append(row)  # row: pandas Series
 
-    if not found_rows: return "Şarkı bulunamadı.", None
+    if not found_rows:
+        return None, None
 
+    # Kullanıcı vektörü: bulunan şarkıların feature ortalaması
     user_vec = pd.DataFrame(found_rows)[model_features].mean().to_frame().T
+
+    # Aynı preprocessing pipeline: scaler -> PCA -> KMeans
     user_scaled = scaler.transform(user_vec)
-    cluster_id = int(kmeans.predict(user_scaled)[0])
-    dna_name = cluster_names[cluster_id]
+    user_pca = pca.transform(user_scaled)          # <-- KRİTİK (model PCA ile eğitildi)
+    cluster_id = int(kmeans.predict(user_pca)[0])
 
-    recs = df_final[df_final["cluster"] == cluster_id].copy()
-    recs = recs[~recs["track_name"].str.lower().isin([r['track_name'].lower() for r in found_rows])]
-    top_recs = recs.sort_values("track_popularity", ascending=False).head(5)
+    dna_name = cluster_names.get(cluster_id, f"Cluster {cluster_id}")
 
-    return dna_name, top_recs[["track_name", "track_artist"]]
+    # Öneriler: aynı cluster'dan popüler şarkılar
+    used_names = {r["track_name"].lower() for r in found_rows if isinstance(r.get("track_name"), str)}
+    recs = df[df["cluster"] == cluster_id].copy()
 
+    recs = recs[~recs["track_name"].str.lower().isin(used_names)]
+    top_recs = recs.sort_values("track_popularity", ascending=False).head(top_n)
+
+    return dna_name, top_recs[["track_name", "track_artist", "track_popularity"]]
 
 # --- ÖRNEK KULLANIM ---
 demo_songs = [{"name": "Anaconda", "artist": "Nicki Minaj"}, {"name": "Shape of You"}]
 dna, recommendations = music_dna_engine(demo_songs)
 
-print(f"\n===== SONUÇ =====")
-print(f"Sizin Müzikal Kişiliğiniz: {dna}")
-print("\nDNA'nıza Uygun Tavsiyeler:")
-print(recommendations)
+print("\n===== SONUÇ =====")
 
+if dna is None:
+    print("Şarkı bulunamadı. Lütfen şarkı adlarını kontrol edin.")
+else:
+    print(f"Sizin Müzikal Kişiliğiniz: {dna}")
+    print("\nDNA'nıza Uygun Tavsiyeler:")
+    print(recommendations)
+
+import joblib
+
+# df_final, scaler, pca, kmeans, model_features, cluster_names hazır olduktan SONRA çalıştır:
+joblib.dump(
+    {
+        "df_final": df_final,
+        "scaler": scaler,
+        "pca": pca,
+        "kmeans": kmeans,
+        "model_features": model_features,
+        "cluster_names": cluster_names,
+    },
+    "musicdna_artifacts.joblib"
+)
+
+print("✅ Kaydedildi: musicdna_artifacts.joblib")
