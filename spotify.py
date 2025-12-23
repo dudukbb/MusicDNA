@@ -309,7 +309,7 @@ plt.title("İdeal Küme Sayısı İçin Dirsek Metodu (Elbow)")
 plt.grid(True)
 plt.show()
 
-best_k = 5  # senin seçtiğin k (elbow/silhouette'tan gelen)
+best_k = 4  # senin seçtiğin k (elbow/silhouette'tan gelen)
 kmeans = KMeans(n_clusters=best_k, random_state=42, n_init=10)
 
 df_final["cluster"] = kmeans.fit_predict(X_pca)
@@ -333,47 +333,103 @@ cluster_z = cluster_z.replace([np.inf, -np.inf], np.nan).fillna(0)
 # Düşük Enerji + Düşük Valans = Hüzünlü & Melankolik
 # Teknik Katman: Şarkının fiziksel yapısını kontrol eder. Çok fazla kelime varsa "Sözel/Rap", enstrüman ağırlıklıysa "Enstrümantal/Odak" etiketini yapıştırır.
 # Lyrical (Sözsel) Katman: NLP analizi sonuçlarını kontrol eder. Eğer şarkı sözlerinde hüzün kelimeleri (sadness) diğer kümelere göre çok baskınsa "Duygusal Derinlik" ekler.
-def name_cluster(z):
+def name_cluster(
+    z,
+    max_tags=3,
+    top_k=2,
+    min_z=0.8,
+):
+    """
+    z: cluster'ın z-skor profil sözlüğü (örn. cluster_z.loc[cid].to_dict()).
+       Z-skor: 0 = ortalama, 1 = ~1 std üstü.
+
+    Strateji:
+    1) Psikolojik katman (Energy & Valence) -> her zaman 1 ana mood etiketi
+    2) Teknik katman -> seçilebilir adaylar (danceability, instrumentalness, speechiness, acousticness)
+    3) Top-k: z-skoru en yüksek olanlardan min_z üstündekileri seç
+    4) Toplam etiket sayısı max_tags'ı geçmesin
+    """
+
     tags = []
 
-    # 1. PSİKOLOJİK KATMAN: Russell'ın Circumplex Modeli (Energy & Valence Dengesi)
-    # Energy (Arousal) ve Valence (Pleasure) eksenlerine göre duygu durumu tayini
-    if z["energy"] > 0 and z["valence"] > 0:
+    # =========================================================
+    # 1) PSİKOLOJİK KATMAN (her zaman 1 etiket)
+    # =========================================================
+    energy = float(z.get("energy", 0.0))
+    valence = float(z.get("valence", 0.0))
+
+    if energy > 0 and valence > 0:
         tags.append("Mutlu & Coşkulu")
-    elif z["energy"] > 0 and z["valence"] <= 0:
+    elif energy > 0 and valence <= 0:
         tags.append("Agresif & Dinamik")
-    elif z["energy"] <= 0 and z["valence"] <= 0:
+    elif energy <= 0 and valence <= 0:
         tags.append("Hüzünlü & Melankolik")
-    elif z["energy"] <= 0 and z["valence"] > 0:
+    else:
         tags.append("Huzurlu & Sakin")
 
-    # 2. TEKNİK KATMAN: Ses Karakteristiği (Audio Features)
-    if z["danceability"] > 0.5:
-        tags.append("Dans/Party")
-    if z["instrumentalness"] > 0.6:
-        tags.append("Enstrümantal/Odak")
-    if z["speechiness"] > 0.6:
-        tags.append("Sözel/Rap")
-    if z["acousticness"] > 0.5:
-        tags.append("Akustik")
+    # Etiket kotası dolduysa erken çık
+    if len(tags) >= max_tags:
+        return tags[:max_tags]
 
-    # 3. LYRICAL KATMAN: Sözlerdeki Duygu Derinliği (Lyrics Features)
-    # Eğer psikolojik katman "Hüzünlü" dediyse ve sözler de bunu destekliyorsa pekiştirir
-    if z["lyr_sadness"] > 0.4 or z["lyr_negative"] > 0.4:
-        if "Hüzünlü & Melankolik" not in tags:  # Tekrarı önlemek için
-            tags.append("Duygusal Derinlik")
-    if z["lyr_joy"] > 0.4 or z["lyr_positive"] > 0.4:
-        if "Mutlu & Coşkulu" not in tags:
-            tags.append("Pozitif Vibes")
-    if z["lyr_negative"] > 0.6 or z["lyr_anger"] > 0.6:
-        tags.append("Karanlık Sözler")
+    # =========================================================
+    # 2) TEKNİK KATMAN (aday etiketler)
+    #    Not: burada z-skorlar "hangi özellik cluster'da baskın?" sorusuna yanıt verir.
+    # =========================================================
+    candidates = [
+        ("danceability", "Dans/Party"),
+        ("instrumentalness", "Enstrümantal/Odak"),
+        ("speechiness", "Sözel/Rap"),
+        ("acousticness", "Akustik"),
+    ]
 
-    # En belirgin ilk 2 etiketi birleştir, yoksa "Dengeli Karma" de
-    return " + ".join(tags[:2]) if tags else "Dengeli / Karma"
+    scored = []
+    for key, label in candidates:
+        val = float(z.get(key, 0.0))
+        scored.append((val, label))
 
+    # En yüksek z-skorlu adayları başa getir
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    # =========================================================
+    # 3) Top-k seçimi + min_z filtresi + max_tags limiti
+    # =========================================================
+    remaining_slots = max_tags - len(tags)
+    take = min(top_k, remaining_slots)
+
+    picked = 0
+    for score, label in scored:
+        if picked >= take:
+            break
+        if score >= min_z:
+            tags.append(label)
+            picked += 1
+
+    # Eğer min_z yüzünden hiç seçemediyse ama yer varsa:
+    # (cluster çok "ortalama" ise yine de açıklayıcı 1 teknik etiket ver)
+    if picked == 0 and remaining_slots > 0:
+        tags.append(scored[0][1])  # en yüksek olanı ekle
+
+    return tags[:max_tags]
 
 # Uygulama ve Eşleme
-cluster_names = cluster_z.apply(name_cluster, axis=1).to_dict()
+# cluster_z: index = cluster_id, kolonlar = feature z-skorları
+# name_cluster: yeni fonksiyonun (max_tags/top_k/min_z parametreli)
+
+cluster_names = (
+    cluster_z.apply(
+        lambda row: " / ".join(
+            name_cluster(
+                row.to_dict(),
+                max_tags=3,   # toplam etiket limiti
+                top_k=2,      # teknik katmandan seçilecek sayi
+                min_z=0.8     # "belirgin" sayılacak z eşiği
+            )
+        ),
+        axis=1
+    )
+    .to_dict()
+)
+
 df_final["cluster_name"] = df_final["cluster"].map(cluster_names)
 
 # Sonuçları Kontrol Et
@@ -392,34 +448,73 @@ X_viz = pca_viz.fit_transform(X_pca)
 df_final["pca1"], df_final["pca2"] = X_viz[:, 0], X_viz[:, 1]
 centroids_2d = pca_viz.transform(kmeans.cluster_centers_)
 
-plt.figure(figsize=(12, 7))
+COLOR_MAP = {
+    0: "#1f77b4",  # mavi
+    1: "#ff7f0e",  # turuncu
+    2: "#2ca02c",  # yeşil
+    3: "#d62728",  # kırmızı
+    4: "#9467bd",  # mor (5 cluster varsa)
+}
+
+plt.figure(figsize=(13, 8))
 clusters = sorted(df_final["cluster"].unique())
 
 for cid in clusters:
     sub = df_final[df_final["cluster"] == cid]
-    plt.scatter(sub["pca1"], sub["pca2"],
-                alpha=0.18, s=8,
-                label=f"{cid} - {cluster_names[cid]}")
+    plt.scatter(
+        sub["pca1"], sub["pca2"],
+        s=14,                    # biraz daha büyük nokta
+        alpha=0.35,              # daha net görünür
+        color=COLOR_MAP.get(cid, "#333333"),
+        edgecolors="none",
+        label=f"{cid} - {cluster_names[cid]}"
+    )
 
-plt.scatter(centroids_2d[:, 0], centroids_2d[:, 1],
-            marker="X", s=260, c="black", label="Centroid")
+# Centroid'ler
+plt.scatter(
+    centroids_2d[:, 0], centroids_2d[:, 1],
+    marker="X",
+    s=320,
+    color="black",
+    edgecolor="white",
+    linewidth=1.5,
+    label="Centroid"
+)
 
+# Centroid numaraları
 for i, (x, y) in enumerate(centroids_2d):
-    plt.text(x + 0.2, y + 0.2, f"{i}", fontsize=10, fontweight="bold",
-             bbox=dict(facecolor="white", alpha=0.85, edgecolor="none"))
+    plt.text(
+        x + 0.15, y + 0.15,
+        f"{i}",
+        fontsize=11,
+        fontweight="bold",
+        bbox=dict(
+            facecolor="white",
+            alpha=0.95,
+            edgecolor="black",
+            boxstyle="round,pad=0.25"
+        )
+    )
 
-plt.title("MusicDNA Kümeleme Haritası (PCA 2D)")
+plt.title("MusicDNA Kümeleme Haritası (PCA 2D)", fontsize=14, fontweight="bold")
 plt.xlabel("PCA-1")
 plt.ylabel("PCA-2")
 
-# outlier kırpma (sunumda çok iyi durur)
+# Outlier kırpma (sunum için çok iyi)
 plt.xlim(df_final["pca1"].quantile(0.01), df_final["pca1"].quantile(0.99))
 plt.ylim(df_final["pca2"].quantile(0.01), df_final["pca2"].quantile(0.99))
 
-plt.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=True)
+# Legend'i sade ve net yap
+plt.legend(
+    loc="center left",
+    bbox_to_anchor=(1.02, 0.5),
+    frameon=True,
+    fontsize=10
+)
+
+plt.grid(alpha=0.15)   # çok hafif grid (okunabilirlik)
 plt.tight_layout()
 plt.show()
-
 
 # ==========================================
 # 7. KULLANICI PROFİLLEME VE TAVSİYE
