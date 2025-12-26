@@ -93,5 +93,19 @@ kişilik temelli bir **MusicDNA profili** oluşturmaktır.
 - Proje tamamen **denetimsiz öğrenme (unsupervised learning)** yaklaşımı ile geliştirilmiştir
 - Genre ve subgenre bilgileri, modele girdi olarak verilmemiştir
 
+### Projeyi Çalıştırma Sırası
+Uygulama çalıştırılmadan önce model ve gerekli artefaktların oluşturulması gerekir.
+Bu nedenle komutlar **aşağıdaki sırayla** çalıştırılmalıdır:
+
+1. `pipeline.py`
+2. `app.py`
+
+Önce:
+```bash
+python pipeline.py
+Sonra:
+```bash
+streamlit run app.py
+
 
 
