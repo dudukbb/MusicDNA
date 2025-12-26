@@ -100,13 +100,13 @@ Bu nedenle komutlar **aşağıdaki sırayla** çalıştırılmalıdır:
 1. `pipeline.py`
 2. `app.py`
 
-Önce:
 ```bash
+# Önce:
 python pipeline.py
 
-Sonra:
-```bash
+# Sonra:
 streamlit run app.py
+
 
 
 
