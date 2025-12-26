@@ -4,16 +4,16 @@ MusicDNA, Spotify şarkılarına ait ses özellikleri ve şarkı sözlerinden ç
 duygu sinyallerini (NRCLex) kullanarak, denetimsiz öğrenme yöntemleri
 (PCA + KMeans) ile kişilik temelli müzik dinleme eğilimlerini analiz etmeyi amaçlar.
 
-## Proje Genel Bakışı (Project Overview)
+## Proje Genel Bakışı
 MusicDNA, kullanıcının seçtiği küçük bir şarkı listesi üzerinden:
 
 - Spotify audio feature’larını ve şarkı sözlerinden çıkarılan duygu özelliklerini kullanır
 - PCA ile boyut indirgeme uygular
 - KMeans algoritması ile şarkıları kümeler
 - Kullanıcının en yakın olduğu kümeye göre yorumlanabilir bir
-  **“müzik kişiliği (Music Personality)”** özeti üretir
+  **“müzik kişiliği”** özeti üretir
 
-## Veri Seti (Dataset)
+## Veri Seti
 Bu projede, Kaggle üzerinde herkese açık olarak paylaşılan aşağıdaki veri seti kullanılmıştır:
 
 - **Audio Features and Lyrics of Spotify Songs**
@@ -37,7 +37,7 @@ Kümeleme işlemi iki ana katmandan elde edilen özellikler kullanılarak yapıl
 > **kümeleme işlemine dahil edilmemiştir**.
 > Bu alanlar yalnızca sonuçların yorumlanması ve kümelerin adlandırılması amacıyla kullanılmıştır.
 
-## Yöntem (Method)
+## Yöntem
 1. **Önişleme**
    - Eksik verilerin ele alınması
    - Sayısal değişkenlerin ölçeklendirilmesi (StandardScaler)
