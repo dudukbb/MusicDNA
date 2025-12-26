@@ -103,6 +103,7 @@ Bu nedenle komutlar **aşağıdaki sırayla** çalıştırılmalıdır:
 Önce:
 ```bash
 python pipeline.py
+
 Sonra:
 ```bash
 streamlit run app.py
