@@ -1,0 +1,9 @@
+# datasets & artifacts
+datasets/
+*.joblib
+
+# virtual env & ide
+.venv/
+.idea/
+__pycache__/
+*.pyc
