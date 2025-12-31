@@ -133,6 +133,8 @@ Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve g
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 1) Ana Pipeline
+
+### **1️⃣ Ana Pipeline (Model ve Artefakt Oluşturma)**
 ```bash
 python pipeline.py
 
@@ -156,7 +158,15 @@ KMeans modeli
 nihai veri seti (df_final)
 kullanılan özellik listesi
 
-### 2) Kümeleme Değerlendirmesi (Evaluation)
+### **2️⃣ Kümeleme Değerlendirmesi (Evaluation)**
+### **3️⃣ Raporlama ve Görselleştirme (Reports)**
+### **4️⃣ Alt Kümeleme (Subclustering – Opsiyonel)**
+### **5️⃣ Streamlit Uygulaması (Son Adım)**
+
+
+
+
+
 ```bash
 python evaluation/pca_distance_test.py
 python evaluation/silhouette_test.py
