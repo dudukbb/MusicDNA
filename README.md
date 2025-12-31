@@ -132,9 +132,7 @@ Model karmaşıklığını azaltmak ve ayrıştırıcı gücü artırmak amacıy
 Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve gerekli artefaktların oluşturulması gerekir.  
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
-### 1) Ana Pipeline
-
-### **1️⃣ Ana Pipeline (Model ve Artefakt Oluşturma)**
+### 1) Ana Pipeline (Model ve Artefakt OLuşturma)**
 ```bash
 python pipeline.py
 
@@ -158,15 +156,9 @@ KMeans modeli
 nihai veri seti (df_final)
 kullanılan özellik listesi
 
-### **2️⃣ Kümeleme Değerlendirmesi (Evaluation)**
-### **3️⃣ Raporlama ve Görselleştirme (Reports)**
-### **4️⃣ Alt Kümeleme (Subclustering – Opsiyonel)**
-### **5️⃣ Streamlit Uygulaması (Son Adım)**
+---
 
-
-
-
-
+### 2) Kümeleme Değerlendirmesi (Evaluation)**
 ```bash
 python evaluation/pca_distance_test.py
 python evaluation/silhouette_test.py
