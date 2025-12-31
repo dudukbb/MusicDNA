@@ -163,7 +163,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
   kümeleme kalitesi nicel olarak değerlendirilir.
 
 
-**pca_distance_test.py**
+- pca_distance_test.py
 **Ne yapar?**
 - Her noktanın kendi kümesinin centroid’ine olan uzaklığını hesaplar
 - En yakın diğer kümenin centroid’ine olan uzaklıkla karşılaştırır
@@ -173,7 +173,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - PCA mesafe histogramı (evaluation/outputs/)
 
 
-**silhouette_test.py**
+- silhouette_test.py
 **Ne yapar?**
 - PCA uzayında silhouette skorunu hesaplar
 - Örnek bazlı silhouette dağılımını analiz eder
@@ -183,7 +183,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - Silhouette histogram görseli
 
 
-**genre_cluster_analysis.py**
+- genre_cluster_analysis.py
 **Ne yapar?**
 - Küme etiketleri ile genre dağılımını karşılaştırır
 - Genre bilgisinin modele girdi olmadan nasıl dağıldığını gösterir
@@ -194,12 +194,12 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 
 ### 3) Raporlama ve Görselleştirme (Reports)
-**python reports/cluster_evaluation_metrics.py**
-**python reports/cluster_evaluation_visuals.py**
+- python reports/cluster_evaluation_metrics.py
+- python reports/cluster_evaluation_visuals.py**
 
 - Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
 
-## cluster_evaluation_metrics.py
+- cluster_evaluation_metrics.py
 **Ne yapar?**
 - Silhouette Score
 - Inertia (SSD)
@@ -210,7 +210,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - Raporun nicel değerlendirme bölümü için temel metrikler
 
 
-## cluster_evaluation_visuals.py
+- cluster_evaluation_visuals.py
 
 **Ne yapar?**
 - PCA 2D küme dağılım grafiği
@@ -223,7 +223,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
   (cluster map, silhouette plot, distance matrix)
 
 ### 4) Alt Kümeleme (Subclustering – Opsiyonel)
-## python subcluster_cluster0.py
+**python subcluster_cluster0.py**
 - Bu adım yalnızca belirli bir kümenin (Cluster 0) kendi iç yapısını
   daha ayrıntılı analiz etmek amacıyla kullanılır.
 
@@ -239,7 +239,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - Bu adım ana modeli değiştirmez, yalnızca yorumlama derinliği sağlar.
 
 ### 5) Streamlit Uygulaması (Son Adım)
-## streamlit run app.py
+- streamlit run app.py
 - Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
   kullanıcıya yönelik interaktif arayüz çalıştırılır.
 
