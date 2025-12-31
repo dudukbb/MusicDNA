@@ -199,7 +199,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 - Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
 
-**cluster_evaluation_metrics.py**
+## cluster_evaluation_metrics.py
 **Ne yapar?**
 - Silhouette Score
 - Inertia (SSD)
@@ -210,7 +210,8 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - Raporun nicel değerlendirme bölümü için temel metrikler
 
 
-**cluster_evaluation_visuals.py**
+## cluster_evaluation_visuals.py
+
 **Ne yapar?**
 - PCA 2D küme dağılım grafiği
 - Centroid işaretleri
@@ -222,7 +223,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
   (cluster map, silhouette plot, distance matrix)
 
 ### 4) Alt Kümeleme (Subclustering – Opsiyonel)
-**python subcluster_cluster0.py**
+## python subcluster_cluster0.py
 - Bu adım yalnızca belirli bir kümenin (Cluster 0) kendi iç yapısını
   daha ayrıntılı analiz etmek amacıyla kullanılır.
 
@@ -238,11 +239,11 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - Bu adım ana modeli değiştirmez, yalnızca yorumlama derinliği sağlar.
 
 ### 5) Streamlit Uygulaması (Son Adım)
-**streamlit run app.py**
+## streamlit run app.py
 - Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
   kullanıcıya yönelik interaktif arayüz çalıştırılır.
 
-**Ne yapar?**
+## Ne yapar?
 **musicdna_artifacts.joblib** dosyasını yükler
 - Kullanıcıdan şarkı girdileri alır
 - Kullanıcının müzik kişiliğini analiz eder
