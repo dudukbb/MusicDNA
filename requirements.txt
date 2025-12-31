@@ -6,4 +6,3 @@ joblib
 nrclex
 nltk
 matplotlib
-seaborn
