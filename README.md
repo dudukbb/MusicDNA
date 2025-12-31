@@ -133,152 +133,121 @@ Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve g
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 1) Ana Pipeline (Model ve Artefakt OLuşturma)**
-python pipeline.py
-
+**python pipeline.py**
 **Ne yapılır?**
-
-Spotify veri seti (spotify_songs.csv) yüklenir
-Eksik ve geçersiz kayıtlar temizlenir
-Audio feature’lar ve lyrics tabanlı duygu özellikleri çıkarılır
-Tüm sayısal özellikler StandardScaler ile ölçeklendirilir
-PCA uygulanarak boyut indirgeme yapılır
-KMeans ile ana kümeleme gerçekleştirilir
-PCA bileşenleri (pca1, pca2) veri setine eklenir
-Küme etiketleri (cluster, cluster_name) oluşturulur
+- Spotify veri seti (spotify_songs.csv) yüklenir
+- Eksik ve geçersiz kayıtlar temizlenir
+- Audio feature’lar ve lyrics tabanlı duygu özellikleri çıkarılır
+- Tüm sayısal özellikler StandardScaler ile ölçeklendirilir
+- PCA uygulanarak boyut indirgeme yapılır
+- KMeans ile ana kümeleme gerçekleştirilir
+- PCA bileşenleri (pca1, pca2) veri setine eklenir
+- Küme etiketleri (cluster, cluster_name) oluşturulur
 
 **Ne elde edilir?**
-
-musicdna_artifacts.joblib
-eğitilmiş scaler
-PCA modeli
-KMeans modeli
-nihai veri seti (df_final)
-kullanılan özellik listesi
+- musicdna_artifacts.joblib
+- eğitilmiş scaler
+- PCA modeli
+- KMeans modeli
+- nihai veri seti (df_final)
+- kullanılan özellik listesi
 
 ---
 
 ### 2) Kümeleme Değerlendirmesi (Evaluation)**
+**python evaluation/pca_distance_test.py**
+**python evaluation/silhouette_test.py**
+**python evaluation/genre_cluster_analysis.py**
 
-python evaluation/pca_distance_test.py
-python evaluation/silhouette_test.py
-python evaluation/genre_cluster_analysis.py
-
-Bu adımda, pipeline.py ile oluşturulan artefaktlar kullanılarak
-kümeleme kalitesi nicel olarak değerlendirilir.
-
-
-pca_distance_test.py
-
-Ne yapar?
-
-Her noktanın kendi kümesinin centroid’ine olan uzaklığını hesaplar
-En yakın diğer kümenin centroid’ine olan uzaklıkla karşılaştırır
-
-Ne elde edilir?
-
-Küme içi vs küme dışı mesafe istatistikleri
-PCA mesafe histogramı (evaluation/outputs/)
+- Bu adımda, pipeline.py ile oluşturulan artefaktlar kullanılarak
+  kümeleme kalitesi nicel olarak değerlendirilir.
 
 
-silhouette_test.py
+**pca_distance_test.py**
+**Ne yapar?**
+- Her noktanın kendi kümesinin centroid’ine olan uzaklığını hesaplar
+- En yakın diğer kümenin centroid’ine olan uzaklıkla karşılaştırır
 
-Ne yapar?
-
-PCA uzayında silhouette skorunu hesaplar
-Örnek bazlı silhouette dağılımını analiz eder
-
-Ne elde edilir?
-
-Genel silhouette score
-Silhouette histogram görseli
+**Ne elde edilir?**
+- Küme içi vs küme dışı mesafe istatistikleri
+- PCA mesafe histogramı (evaluation/outputs/)
 
 
-genre_cluster_analysis.py
+**silhouette_test.py**
+**Ne yapar?**
+- PCA uzayında silhouette skorunu hesaplar
+- Örnek bazlı silhouette dağılımını analiz eder
 
-Ne yapar?
+**Ne elde edilir?**
+- Genel silhouette score
+- Silhouette histogram görseli
 
-Küme etiketleri ile genre dağılımını karşılaştırır
-Genre bilgisinin modele girdi olmadan nasıl dağıldığını gösterir
 
-Ne elde edilir?
+**genre_cluster_analysis.py**
+**Ne yapar?**
+- Küme etiketleri ile genre dağılımını karşılaştırır
+- Genre bilgisinin modele girdi olmadan nasıl dağıldığını gösterir
 
-Cluster × Genre yüzde tablosu (.csv)
-Kümelerin müzikal olarak anlamlı olduğunu gösteren destekleyici analiz
+**Ne elde edilir?**
+- Cluster × Genre yüzde tablosu (.csv)
+- Kümelerin müzikal olarak anlamlı olduğunu gösteren destekleyici analiz
 
 
 ### 3) Raporlama ve Görselleştirme (Reports)
+**python reports/cluster_evaluation_metrics.py**
+**python reports/cluster_evaluation_visuals.py**
+
+- Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
+
+**cluster_evaluation_metrics.py**
+**Ne yapar?**
+- Silhouette Score
+- Inertia (SSD)
+- Küme içi / küme dışı mesafe özetlerini hesaplar
+
+**Ne elde edilir?**
+- Kümeleme kalitesini sayısal olarak özetleyen çıktılar
+- Raporun nicel değerlendirme bölümü için temel metrikler
 
 
-python reports/cluster_evaluation_metrics.py
-python reports/cluster_evaluation_visuals.py
+**cluster_evaluation_visuals.py**
+**Ne yapar?**
+- PCA 2D küme dağılım grafiği
+- Centroid işaretleri
+- Silhouette plot
+- Centroid distance heatmap
 
-Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
-
-
-cluster_evaluation_metrics.py
-
-Ne yapar?
-
-Silhouette Score
-Inertia (SSD)
-Küme içi / küme dışı mesafe özetlerini hesaplar
-
-Ne elde edilir?
-
-Kümeleme kalitesini sayısal olarak özetleyen çıktılar
-Raporun nicel değerlendirme bölümü için temel metrikler
-
-
-cluster_evaluation_visuals.py
-
-Ne yapar?
-
-PCA 2D küme dağılım grafiği
-Centroid işaretleri
-Silhouette plot
-Centroid distance heatmap
-
-Ne elde edilir?
-
-Raporun ana figürleri
-(cluster map, silhouette plot, distance matrix)
+**Ne elde edilir?**
+- Raporun ana figürleri
+  (cluster map, silhouette plot, distance matrix)
 
 ### 4) Alt Kümeleme (Subclustering – Opsiyonel)
+**python subcluster_cluster0.py**
+- Bu adım yalnızca belirli bir kümenin (Cluster 0) kendi iç yapısını
+  daha ayrıntılı analiz etmek amacıyla kullanılır.
 
-python subcluster_cluster0.py
+**Ne yapar?**
+- Ana clustering sonucunda elde edilen Cluster 0’ı izole eder
+- Bu küme üzerinde yeniden KMeans uygular
+- Alt müzikal yapıların (ör. Pop / Rap) ayrışmasını inceler
 
-Bu adım yalnızca belirli bir kümenin (Cluster 0) kendi iç yapısını
-daha ayrıntılı analiz etmek amacıyla kullanılır.
-
-Ne yapar?
-
-Ana clustering sonucunda elde edilen Cluster 0’ı izole eder
-Bu küme üzerinde yeniden KMeans uygular
-Alt müzikal yapıların (ör. Pop / Rap) ayrışmasını inceler
-
-Ne elde edilir?
-
-Subcluster etiketleri
-PCA tabanlı alt küme görselleri
-Küme isimlendirmesini destekleyen ek analizler
-
-Bu adım ana modeli değiştirmez, yalnızca yorumlama derinliği sağlar.
+**Ne elde edilir?**
+- Subcluster etiketleri
+- PCA tabanlı alt küme görselleri
+- Küme isimlendirmesini destekleyen ek analizler
+- Bu adım ana modeli değiştirmez, yalnızca yorumlama derinliği sağlar.
 
 ### 5) Streamlit Uygulaması (Son Adım)
+**streamlit run app.py**
+- Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
+  kullanıcıya yönelik interaktif arayüz çalıştırılır.
 
-streamlit run app.py
+**Ne yapar?**
+**musicdna_artifacts.joblib** dosyasını yükler
+- Kullanıcıdan şarkı girdileri alır
+- Kullanıcının müzik kişiliğini analiz eder
+- En yakın kümeyi ve önerileri görsel olarak sunar
 
-Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
-kullanıcıya yönelik interaktif arayüz çalıştırılır.
-
-Ne yapar?
-
-musicdna_artifacts.joblib dosyasını yükler
-Kullanıcıdan şarkı girdileri alır
-Kullanıcının müzik kişiliğini analiz eder
-En yakın kümeyi ve önerileri görsel olarak sunar
-
-Ne elde edilir?
-
-Çalışan MusicDNA web arayüzü
+**Ne elde edilir?**
+- Çalışan MusicDNA web arayüzü
 
