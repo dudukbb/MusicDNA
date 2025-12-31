@@ -133,7 +133,7 @@ Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve g
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 1) Ana Pipeline (Model ve Artefakt OLuşturma)**
-**python pipeline.py**
+- python pipeline.py
 **Ne yapılır?**
 - Spotify veri seti (spotify_songs.csv) yüklenir
 - Eksik ve geçersiz kayıtlar temizlenir
@@ -155,9 +155,9 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 ---
 
 ### 2) Kümeleme Değerlendirmesi (Evaluation)**
-**python evaluation/pca_distance_test.py**
-**python evaluation/silhouette_test.py**
-**python evaluation/genre_cluster_analysis.py**
+- python evaluation/pca_distance_test.py
+- python evaluation/silhouette_test.py
+- python evaluation/genre_cluster_analysis.py
 
 - Bu adımda, pipeline.py ile oluşturulan artefaktlar kullanılarak
   kümeleme kalitesi nicel olarak değerlendirilir.
