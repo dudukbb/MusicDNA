@@ -11,13 +11,23 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 from config import (
-    NRC_EMOTIONS, AUDIO_FEATURES,
-    PCA_VARIANCE, BEST_K, RANDOM_STATE,
-    USELESS_COLS, ARTIFACT_PATH
+    NRC_EMOTIONS,
+    AUDIO_FEATURES,
+    PCA_VARIANCE,
+    BEST_K,
+    RANDOM_STATE,
+    USELESS_COLS,
+    ARTIFACT_PATH,
+    KEEP_LYRICS,
+    LYR_WEIGHT,
+    BOOST_FACTORS,
+    WINSOR_Q_LOW,
+    WINSOR_Q_HIGH,
+    ELBOW_K_MIN,
+    ELBOW_K_MAX,
 )
 from utils import find_csv_path
 from artifacts import export_artifacts
-
 from metrics_utils import (
     plot_corr_heatmap,
     compute_silhouette,
@@ -47,20 +57,20 @@ def name_cluster(z: dict, max_tags: int = 3, top_k: int = 2, min_z: float = 0.8)
     energy = float(z.get("energy", 0.0))
     valence = float(z.get("valence", 0.0))
 
-    TH = 0.2
+    th = 0.2
     tags: list[str] = []
     mood_label = "Medium Energy – Balanced Valence"
 
-    if energy > TH and valence > TH:
+    if energy > th and valence > th:
         tags.append("Coşkulu & Dans")
         mood_label = "High Energy – Positive Valence"
-    elif energy > TH and valence < -TH:
+    elif energy > th and valence < -th:
         tags.append("Sert & Yoğun")
         mood_label = "High Energy – Negative Valence"
-    elif energy < -TH and valence < -TH:
+    elif energy < -th and valence < -th:
         tags.append("Melankolik & Düşük Enerji")
         mood_label = "Low Energy – Negative Valence"
-    elif energy < -TH and valence > TH:
+    elif energy < -th and valence > th:
         tags.append("Sakin & Huzurlu")
         mood_label = "Low Energy – Positive Valence"
     else:
@@ -74,7 +84,7 @@ def name_cluster(z: dict, max_tags: int = 3, top_k: int = 2, min_z: float = 0.8)
         ("instrumentalness", "Enstrümantal"),
     ]
 
-    scored = [(float(z.get(key, 0.0)), label) for key, label in candidates]
+    scored = [(float(z.get(k, 0.0)), label) for k, label in candidates]
     scored.sort(key=lambda x: x[0], reverse=True)
 
     remaining = max_tags - len(tags)
@@ -110,21 +120,14 @@ def build_artifacts(csv_path: str | None = None):
     # 3) NRC Lex features
     print("Duygu analizi yapılıyor...")
     lyrics_feat_df = pd.DataFrame(df["lyrics"].apply(nrclex_features).tolist())
-    lyric_cols = [c for c in lyrics_feat_df.columns if c.startswith("lyr_")]
 
-    KEEP_LYRICS = [
-        "lyr_joy",
-        "lyr_sadness",
-        "lyr_anger",
-        "lyr_positive",
-        "lyr_negative",
-    ]
-    lyric_cols = [c for c in lyric_cols if c in KEEP_LYRICS]
+    lyric_cols_all = [c for c in lyrics_feat_df.columns if c.startswith("lyr_")]
+    lyric_cols = [c for c in lyric_cols_all if c in KEEP_LYRICS]
     lyrics_feat_df = lyrics_feat_df[lyric_cols]
 
     df_final = pd.concat(
         [df.reset_index(drop=True), lyrics_feat_df.reset_index(drop=True)],
-        axis=1
+        axis=1,
     )
 
     model_features = AUDIO_FEATURES + lyric_cols
@@ -133,51 +136,29 @@ def build_artifacts(csv_path: str | None = None):
     X = df_final[model_features].copy()
 
     # (A) Lyrics ağırlığı
-    LYR_WEIGHT = 2.0
-    if lyric_cols:
-        X[lyric_cols] = X[lyric_cols] * LYR_WEIGHT
+    if lyric_cols and float(LYR_WEIGHT) != 1.0:
+        X[lyric_cols] = X[lyric_cols] * float(LYR_WEIGHT)
 
-    # (B) Feature weighting
-    if "speechiness" in X.columns:
-        X["speechiness"] *= 1.6
-    if "acousticness" in X.columns:
-        X["acousticness"] *= 1.4
-    if "instrumentalness" in X.columns:
-        X["instrumentalness"] *= 2.0
-
-    if "danceability" in X.columns:
-        X["danceability"] *= 1.15
-    if "energy" in X.columns:
-        X["energy"] *= 0.50
-    if "valence" in X.columns:
-        X["valence"] *= 1.15
-
-    # (B.2) Final BOOST
-    BOOST_FACTORS = {
-        "speechiness": 1.30,
-        "instrumentalness": 1.25,
-        "danceability": 1.20,
-        "valence": 1.15,
-        "energy": 1.10,
-        "acousticness": 1.10,
-    }
+    # (B) Feature boosting
     for col, factor in BOOST_FACTORS.items():
         if col in X.columns:
-            X[col] = X[col] * factor
+            X[col] = X[col] * float(factor)
 
     # (C) Winsorization
+    q_low = float(WINSOR_Q_LOW)
+    q_high = float(WINSOR_Q_HIGH)
     for col in X.columns:
-        low = X[col].quantile(0.01)
-        high = X[col].quantile(0.99)
+        low = X[col].quantile(q_low)
+        high = X[col].quantile(q_high)
         X[col] = X[col].clip(lower=low, upper=high)
 
-    # ✅ Korelasyon matrisleri (model features + audio only)
+    # Korelasyon heatmap (opsiyonel)
     print("\n[Korelasyon] Model feature'ları (audio + lyrics) korelasyon matrisi çiziliyor...")
-    _corr_all = plot_corr_heatmap(df_final, model_features, "Correlation (Audio + Lyrics)")
+    _ = plot_corr_heatmap(df_final, model_features, "Correlation (Audio + Lyrics)")
 
     audio_only = [c for c in AUDIO_FEATURES if c in df_final.columns]
     print("\n[Korelasyon] Sadece audio feature'lar korelasyon matrisi çiziliyor...")
-    _corr_audio = plot_corr_heatmap(df_final, audio_only, "Correlation (Audio Only)")
+    _ = plot_corr_heatmap(df_final, audio_only, "Correlation (Audio Only)")
 
     # Scale + PCA
     scaler = StandardScaler()
@@ -190,14 +171,14 @@ def build_artifacts(csv_path: str | None = None):
     print("PCA sonrası bileşen sayısı:", X_pca.shape[1])
     print("Açıklanan toplam varyans oranı:", pca.explained_variance_ratio_.sum())
 
-    # PCA kolonları (alt kümeleme için faydalı: pca1..pca5)
+    # PCA kolonları (alt kümeleme için: pca1..pca5)
     n_keep = min(5, X_pca.shape[1])
     for i in range(n_keep):
         df_final[f"pca{i+1}"] = X_pca[:, i]
 
-    # 4.5) ELBOW (main)
+    # Elbow (main)
     ssd = []
-    K_range = range(2, 11)
+    K_range = range(int(ELBOW_K_MIN), int(ELBOW_K_MAX) + 1)
     for k in K_range:
         km = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=10)
         km.fit(X_pca)
@@ -217,7 +198,7 @@ def build_artifacts(csv_path: str | None = None):
     kmeans = KMeans(n_clusters=BEST_K, random_state=RANDOM_STATE, n_init=10)
     df_final["cluster"] = kmeans.fit_predict(X_pca)
 
-    # ✅ Metrikler (DB/CH yok)
+    # Metrikler
     sil = compute_silhouette(X_pca, df_final["cluster"].values)
     intra = intra_cluster_distance(X_pca, df_final["cluster"].values)
     inter = inter_centroid_distance(X_pca, df_final["cluster"].values)
@@ -242,8 +223,8 @@ def build_artifacts(csv_path: str | None = None):
             .reset_index(name="count")
         )
         genre_summary["ratio"] = (
-            genre_summary["count"] /
-            genre_summary.groupby("cluster")["count"].transform("sum")
+            genre_summary["count"]
+            / genre_summary.groupby("cluster")["count"].transform("sum")
         )
     else:
         genre_summary = None
@@ -274,7 +255,7 @@ def build_artifacts(csv_path: str | None = None):
     print("\n===== MÜZİKAL KİŞİLİK DAĞILIMI =====")
     print(df_final["cluster_name"].value_counts())
 
-    # 7) PCA 2D plot (legend’de cluster adı yazsın)
+    # PCA 2D plot
     plt.figure(figsize=(10, 7))
     for c in range(BEST_K):
         mask = df_final["cluster"] == c
@@ -284,13 +265,13 @@ def build_artifacts(csv_path: str | None = None):
             df_final.loc[mask, "pca2"],
             s=8,
             alpha=0.4,
-            label=f"Cluster {c}: {cname}"
+            label=f"Cluster {c}: {cname}",
         )
 
     centroids = kmeans.cluster_centers_
     plt.scatter(
         centroids[:, 0], centroids[:, 1],
-        c="black", s=120, marker="x", linewidths=3, label="Centroid"
+        c="black", s=120, marker="x", linewidths=3, label="Centroid",
     )
 
     plt.xlabel("PCA-1")
@@ -314,7 +295,7 @@ def main():
         kmeans=kmeans,
         model_features=model_features,
         cluster_names=cluster_names,
-        out_path=ARTIFACT_PATH
+        out_path=ARTIFACT_PATH,
     )
 
 

@@ -15,15 +15,18 @@ def music_dna_engine(
     pca,
     kmeans,
     cluster_names,
-    top_n=5,
+    top_n: int = 5,
 ):
+    """
+    ✅ 5'li dönüş:
+      (dna_name, cluster_id, soft_top2, recs_df, used_pretty)
+    """
     found_rows = []
     for s in user_song_list:
         row = find_song_row(df_final, s.get("name"), s.get("artist"))
         if row is not None:
             found_rows.append(row)
 
-    # ✅ 5'li dönüş (dna, cluster_id, soft_top2, recs, used)
     if not found_rows:
         return None, None, None, None, []
 
@@ -37,8 +40,8 @@ def music_dna_engine(
     # -----------------------------
     # Soft assignment (top-2 yakınlık)
     # -----------------------------
-    centers = kmeans.cluster_centers_  # (k, pca_dim)
-    dists = np.linalg.norm(centers - user_pca[0], axis=1)  # (k,)
+    centers = kmeans.cluster_centers_
+    dists = np.linalg.norm(centers - user_pca[0], axis=1)
 
     temperature = 1.0
     scores = np.exp(-dists / temperature)
@@ -55,21 +58,26 @@ def music_dna_engine(
         for c in top2
     ]
 
-    used_names = {r["track_name"].lower() for r in found_rows if isinstance(r.get("track_name"), str)}
-    recs = df_final[df_final["cluster"] == cluster_id].copy()
-    recs = recs[~recs["track_name"].str.lower().isin(used_names)]
+    used_names = {
+        r["track_name"].lower()
+        for r in found_rows
+        if isinstance(r.get("track_name"), str)
+    }
 
-    top_recs = recs.sort_values("track_popularity", ascending=False).head(top_n)
+    recs = df_final[df_final["cluster"] == cluster_id].copy()
+    if "track_name" in recs.columns:
+        recs = recs[~recs["track_name"].astype(str).str.lower().isin(used_names)]
+
+    sort_col = "track_popularity" if "track_popularity" in recs.columns else None
+    if sort_col:
+        recs = recs.sort_values(sort_col, ascending=False)
+
+    cols = [c for c in ["track_name", "track_artist", "track_popularity"] if c in recs.columns]
+    top_recs = recs[cols].head(top_n) if cols else recs.head(top_n)
 
     used_pretty = [
-        {"track_name": r["track_name"], "track_artist": r["track_artist"]}
+        {"track_name": r.get("track_name"), "track_artist": r.get("track_artist")}
         for r in found_rows
     ]
 
-    return (
-        dna_name,
-        cluster_id,
-        soft_top2,
-        top_recs[["track_name", "track_artist", "track_popularity"]],
-        used_pretty,
-    )
+    return dna_name, cluster_id, soft_top2, top_recs, used_pretty

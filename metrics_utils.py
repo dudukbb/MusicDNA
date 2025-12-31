@@ -12,12 +12,11 @@ def plot_corr_heatmap(
     cols: list[str],
     title: str,
     figsize=(10, 8),
-    annot: bool = False,
 ):
     """Basit korelasyon heatmap (matplotlib)."""
     if not cols:
         print("[corr] Kolon listesi boş.")
-        return
+        return None
 
     data = df[cols].copy()
     corr = data.corr(numeric_only=True)
@@ -44,8 +43,8 @@ def compute_silhouette(X: np.ndarray, labels: np.ndarray) -> float:
 
 def intra_cluster_distance(X: np.ndarray, labels: np.ndarray) -> float:
     """
-    Basit intra-cluster mesafe:
-    Her noktanın kendi cluster centroid'ine olan ÖKLİD ortalaması.
+    Intra-cluster mesafe:
+    Her noktanın kendi cluster centroid'ine olan Öklid ortalaması.
     """
     uniq = np.unique(labels)
     cents = []
@@ -54,18 +53,15 @@ def intra_cluster_distance(X: np.ndarray, labels: np.ndarray) -> float:
         cents.append(pts.mean(axis=0))
     cents = np.vstack(cents)
 
-    # label -> centroid
     cent_map = {c: cents[i] for i, c in enumerate(uniq)}
-    dists = []
-    for i in range(X.shape[0]):
-        dists.append(np.linalg.norm(X[i] - cent_map[labels[i]]))
+    dists = [np.linalg.norm(X[i] - cent_map[labels[i]]) for i in range(X.shape[0])]
     return float(np.mean(dists))
 
 
 def inter_centroid_distance(X: np.ndarray, labels: np.ndarray) -> float:
     """
-    Basit inter-cluster mesafe:
-    Centroidler arası tüm çiftlerin ÖKLİD ortalaması.
+    Inter-cluster mesafe:
+    Centroidler arası tüm çiftlerin Öklid ortalaması.
     """
     uniq = np.unique(labels)
     cents = []
