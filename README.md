@@ -133,7 +133,6 @@ Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve g
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 1) Ana Pipeline (Model ve Artefakt OLuşturma)**
-```bash
 python pipeline.py
 
 **Ne yapılır?**
@@ -159,7 +158,7 @@ kullanılan özellik listesi
 ---
 
 ### 2) Kümeleme Değerlendirmesi (Evaluation)**
-```bash
+
 python evaluation/pca_distance_test.py
 python evaluation/silhouette_test.py
 python evaluation/genre_cluster_analysis.py
@@ -167,7 +166,7 @@ python evaluation/genre_cluster_analysis.py
 Bu adımda, pipeline.py ile oluşturulan artefaktlar kullanılarak
 kümeleme kalitesi nicel olarak değerlendirilir.
 
-```bash
+
 pca_distance_test.py
 
 Ne yapar?
@@ -180,7 +179,7 @@ Ne elde edilir?
 Küme içi vs küme dışı mesafe istatistikleri
 PCA mesafe histogramı (evaluation/outputs/)
 
-```bash
+
 silhouette_test.py
 
 Ne yapar?
@@ -193,7 +192,7 @@ Ne elde edilir?
 Genel silhouette score
 Silhouette histogram görseli
 
-```bash
+
 genre_cluster_analysis.py
 
 Ne yapar?
@@ -209,13 +208,13 @@ Kümelerin müzikal olarak anlamlı olduğunu gösteren destekleyici analiz
 
 ### 3) Raporlama ve Görselleştirme (Reports)
 
-```bash
+
 python reports/cluster_evaluation_metrics.py
 python reports/cluster_evaluation_visuals.py
 
 Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
 
-```bash
+
 cluster_evaluation_metrics.py
 
 Ne yapar?
@@ -229,7 +228,7 @@ Ne elde edilir?
 Kümeleme kalitesini sayısal olarak özetleyen çıktılar
 Raporun nicel değerlendirme bölümü için temel metrikler
 
-```bash
+
 cluster_evaluation_visuals.py
 
 Ne yapar?
@@ -245,7 +244,7 @@ Raporun ana figürleri
 (cluster map, silhouette plot, distance matrix)
 
 ### 4) Alt Kümeleme (Subclustering – Opsiyonel)
-```bash
+
 python subcluster_cluster0.py
 
 Bu adım yalnızca belirli bir kümenin (Cluster 0) kendi iç yapısını
@@ -266,7 +265,7 @@ Küme isimlendirmesini destekleyen ek analizler
 Bu adım ana modeli değiştirmez, yalnızca yorumlama derinliği sağlar.
 
 ### 5) Streamlit Uygulaması (Son Adım)
-```bash
+
 streamlit run app.py
 
 Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
