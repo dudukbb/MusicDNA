@@ -1,9 +1,9 @@
 pandas
 numpy
+seaborn
 scikit-learn
 streamlit
 joblib
 nrclex
 nltk
 matplotlib
-seaborn
