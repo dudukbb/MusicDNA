@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import pandas as pd
+import subprocess
 import streamlit as st
 
+from pathlib import Path
 from config import HYBRID_DIFF_TH, ARTIFACT_PATH
 from artifacts import load_artifacts
 from engine import music_dna_engine
@@ -19,10 +21,14 @@ st.set_page_config(
 
 @st.cache_resource
 def get_artifacts():
-    # joblib yükleme pahalı; resource cache mantıklı
+    # Eğer joblib dosyası bulutta yoksa otomatik olarak üret
+    if not Path(ARTIFACT_PATH).exists():
+        st.info("🔄 Model artefaktları bulunamadı, arka planda model eğitiliyor, lütfen bekleyin...")
+        subprocess.run(["python3", "pipeline.py"], check=True)
+        
     return load_artifacts(ARTIFACT_PATH)
 
-
+    
 @st.cache_data
 def build_song_options(df: pd.DataFrame) -> list[str]:
     cols = [c for c in ["track_name", "track_artist"] if c in df.columns]
