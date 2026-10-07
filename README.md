@@ -5,6 +5,7 @@
 Proje kapsamında **PCA + KMeans** yaklaşımı kullanılarak, şarkılar doğal kümelere ayrılmış ve bu kümeler **yorumlanabilir müzik kişilikleri** olarak anlamlandırılmıştır.
 
 ---
+ ## Live Demo :** [MusicDNA Web App](https://musicdna.streamlit.app)
 
 ## 📌 Proje Genel Bakışı
 
@@ -25,7 +26,7 @@ Proje, müzik zevklerinin keskin sınırlar yerine **geçişli ve hibrit** bir y
 Bu projede Kaggle üzerinde herkese açık olarak paylaşılan aşağıdaki veri seti kullanılmıştır:
 
 - **Audio Features and Lyrics of Spotify Songs**  
-  https://www.kaggle.com/datasets/muhammad/audio-features-and-lyrics-of-spotify-songs
+  [https://www.kaggle.com/datasets/muhammad/audio-features-and-lyrics-of-spotify-songs](https://www.kaggle.com/datasets/imuhammad/audio-features-and-lyrics-of-spotify-songs)
 
 Veri seti aşağıdaki bileşenleri içermektedir:
 - Spotify audio feature’ları  
