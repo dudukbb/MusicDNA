@@ -10,7 +10,7 @@ NRC_EMOTIONS = [
 ]
 
 # ----------------------------
-# Spotify audio feature set
+# Spotify audio feature set (mode ve key eklendi)
 # ----------------------------
 AUDIO_FEATURES = [
     "danceability",
@@ -22,6 +22,8 @@ AUDIO_FEATURES = [
     "liveness",
     "valence",
     "tempo",
+    "mode",  # Major (1) / Minor (0) ayrımı için
+    "key",   # Şarkının tonu için
 ]
 
 # ----------------------------
@@ -75,15 +77,17 @@ KEEP_LYRICS = [
 LYR_WEIGHT = 2.0
 
 # ----------------------------
-# Feature boosting (opsiyonel ağırlıklandırma)
+# Feature boosting (Ayrışmayı artırmak için çarpanlar yükseltildi)
 # ----------------------------
 BOOST_FACTORS = {
-    "speechiness": 1.30,
-    "instrumentalness": 1.25,
+    "speechiness": 1.60,      # Rap/Sözel parçaları keskin ayırmak için artırıldı
+    "instrumentalness": 1.50, # Enstrümantal parçaları öne çıkarmak için artırıldı
+    "tempo": 1.40,            # Hızlı/Yavaş ritimleri ayrıştırmak için eklendi
     "danceability": 1.20,
     "valence": 1.15,
-    "energy": 1.10,
-    "acousticness": 1.10,
+    "energy": 1.30,           # Enerji ayrımını keskinleştirmek için artırıldı
+    "acousticness": 1.20,
+    "mode": 1.50,             # Majör/Minör zıtlığını modelde baskın kılmak için eklendi
 }
 
 # ----------------------------

@@ -1,6 +1,7 @@
 # pipeline.py
 from __future__ import annotations
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,7 +14,7 @@ from sklearn.cluster import KMeans
 from config import (
     NRC_EMOTIONS,
     AUDIO_FEATURES,
-    PCA_VARIANCE,
+    PCA_VARIANCE, 
     BEST_K,
     RANDOM_STATE,
     USELESS_COLS,
@@ -35,17 +36,29 @@ from metrics_utils import (
     inter_centroid_distance,
 )
 
-
 def nrclex_features(text: str) -> dict:
     """Lyrics metninden duygu skorları çıkarır (token sayısına göre normalize)."""
     if not isinstance(text, str) or text.strip() == "":
         return {f"lyr_{e}": 0.0 for e in NRC_EMOTIONS}
 
-    lex = NRCLex(text)
-    raw = lex.raw_emotion_scores
+    try:
+        # Metni doğrudan text parametresiyle veriyoruz ve varsayılan lexicon'u seçiyoruz
+        lex = NRCLex(text=text, lexicon_file="nrc_en.json")
+    except Exception:
+        # Alternatif olarak TextObject veya doğrudan çağrı denemesi
+        try:
+            from nrclex import TextObject
+            lex = TextObject(text)
+        except Exception:
+            return {f"lyr_{e}": 0.0 for e in NRC_EMOTIONS}
+
+    raw = getattr(lex, "affect_frequencies", {})
+    if not raw and hasattr(lex, "raw_emotion_scores"):
+        raw = lex.raw_emotion_scores
+
     token_count = len(lex.words) if hasattr(lex, "words") else 0
     denom = token_count if token_count > 0 else 1
-    return {f"lyr_{e}": raw.get(e, 0) / denom for e in NRC_EMOTIONS}
+    return {f"lyr_{e}": raw.get(e, 0.0) / denom for e in NRC_EMOTIONS}
 
 
 def name_cluster(z: dict, max_tags: int = 3, top_k: int = 2, min_z: float = 0.8):
@@ -192,6 +205,10 @@ def build_artifacts(csv_path: str | None = None):
     plt.title("Elbow Plot (Main Clustering, PCA space)")
     plt.grid(True)
     plt.tight_layout()
+    
+    # Outputs klasörüne kaydetme eklendi
+    os.makedirs("outputs", exist_ok=True)
+    plt.savefig("outputs/elbow_plot.png", dpi=300, bbox_inches="tight")
     plt.show()
 
     # 5) KMeans (ANA KÜMELEME)
@@ -280,6 +297,9 @@ def build_artifacts(csv_path: str | None = None):
     plt.legend(markerscale=2, loc="upper right")
     plt.grid(alpha=0.3)
     plt.tight_layout()
+    
+    # PCA küme dağılımını outputs klasörüne kaydetme eklendi
+    plt.savefig("outputs/pca_clusters_plot.png", dpi=300, bbox_inches="tight")
     plt.show()
 
     return df_final, scaler, pca, kmeans, model_features, cluster_names
