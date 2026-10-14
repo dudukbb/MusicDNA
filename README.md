@@ -135,6 +135,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 1) Ana Pipeline (Model ve Artifact OLuşturma)**
 - python pipeline.py
+  
 **Ne yapılır?**
 - Spotify veri seti (spotify_songs.csv) yüklenir
 - Eksik ve geçersiz kayıtlar temizlenir
@@ -159,12 +160,10 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 - python evaluation/pca_distance_test.py
 - python evaluation/silhouette_test.py
 - python evaluation/genre_cluster_analysis.py
-
-- Bu adımda, pipeline.py ile oluşturulan artefaktlar kullanılarak
+- Bu adımda, pipeline.py ile oluşturulan artifactler kullanılarak
   kümeleme kalitesi nicel olarak değerlendirilir.
-
-
 - pca_distance_test.py
+  
 **Ne yapar?**
 - Her noktanın kendi kümesinin centroid’ine olan uzaklığını hesaplar
 - En yakın diğer kümenin centroid’ine olan uzaklıkla karşılaştırır
@@ -172,9 +171,8 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 **Ne elde edilir?**
 - Küme içi vs küme dışı mesafe istatistikleri
 - PCA mesafe histogramı (evaluation/outputs/)
-
-
 - silhouette_test.py
+  
 **Ne yapar?**
 - PCA uzayında silhouette skorunu hesaplar
 - Örnek bazlı silhouette dağılımını analiz eder
@@ -182,9 +180,8 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 **Ne elde edilir?**
 - Genel silhouette score
 - Silhouette histogram görseli
-
-
 - genre_cluster_analysis.py
+  
 **Ne yapar?**
 - Küme etiketleri ile genre dağılımını karşılaştırır
 - Genre bilgisinin modele girdi olmadan nasıl dağıldığını gösterir
@@ -197,10 +194,9 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 ### 3) Raporlama ve Görselleştirme (Reports)
 - python reports/cluster_evaluation_metrics.py
 - python reports/cluster_evaluation_visuals.py**
-
 - Bu adım, raporda kullanılan nihai kalite metriklerini ve ana görselleri üretir.
-
 - cluster_evaluation_metrics.py
+
 **Ne yapar?**
 - Silhouette Score
 - Inertia (SSD)
@@ -209,8 +205,6 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 **Ne elde edilir?**
 - Kümeleme kalitesini sayısal olarak özetleyen çıktılar
 - Raporun nicel değerlendirme bölümü için temel metrikler
-
-
 - cluster_evaluation_visuals.py
 
 **Ne yapar?**
