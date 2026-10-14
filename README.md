@@ -133,7 +133,7 @@ Model karmaşıklığını azaltmak ve ayrıştırıcı gücü artırmak amacıy
 Uygulama çalıştırılmadan önce modelin eğitilmesi, değerlendirilmesi ve gerekli artefaktların oluşturulması gerekir.  
 Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
-### 1) Ana Pipeline (Model ve Artefakt OLuşturma)**
+### 1) Ana Pipeline (Model ve Artifact OLuşturma)**
 - python pipeline.py
 **Ne yapılır?**
 - Spotify veri seti (spotify_songs.csv) yüklenir
@@ -241,7 +241,7 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ### 5) Streamlit Uygulaması (Son Adım)
 - streamlit run app.py
-- Bu adımda, daha önce oluşturulmuş artefaktlar kullanılarak
+- Bu adımda, daha önce oluşturulmuş artifactler kullanılarak
   kullanıcıya yönelik interaktif arayüz çalıştırılır.
 
 ## Ne yapar?
