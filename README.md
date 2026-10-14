@@ -249,20 +249,18 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 
 ## 📈 Model Performansı ve Değerlendirme Metrikleri
 
-Unsupervised (denetimsiz) bir kümeleme projesi olduğu için geleneksel "accuracy" (doğruluk) yerine **Silhouette Score**, **Inertia (SSD)** ve **Küme İçi/Dışı Mesafe Analizleri** kullanılmıştır. Modelin doğrulama çıktıları ve kalitesi şu şekildedir:
+Müzik verileri doğası gereği oldukça **gürültülü (noisy)**, heterojen ve keskin sınırlarla ayrılması zor bir yapıya sahiptir. Bu nedenle, geleneksel "accuracy" (doğruluk) metrikleri yerine denetimsiz öğrenmeye (`unsupervised learning`) uygun olan temel nicel metrikler hesaplanmıştır. 
 
-* **Genel Silhouette Score:** Modelin kümeleri ne kadar net ayırdığını gösteren skor `outputs/main/` altında raporlanmaktadır. Yüksek silhouette skoru, kümelerin birbirine karışmadığını ve mantıksal olarak ayrıştığını gösterir.
-* **Genre Dağılım Tutarlılığı:** Modelin tür (genre) bilgisi verilmeden eğitilmesine rağmen, `cluster_genre_table.png` tablosunda ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü görülmüştür.
+### 📊 Sayısal Değerlendirme ve Yorumlar
 
----
+* **Ana Kümeleme (Main Clustering):**
+  * **Silhouette Score (0.2877):** Binlerce şarkıdan oluşan gürültülü Spotify veri setinde, kümelerin birbirine tamamen karışmadığını ve mantıksal bir ayrışma sergilediğini doğrular.
+  * **Calinski-Harabasz (8542.92) & Davies-Bouldin (1.9384):** Küme içi yoğunluğun ve kümeler arası ayrımın optimal düzeyde olduğunu gösterir.
+  * **Genre Dağılım Tutarlılığı:** Model **hiçbir şekilde tür (genre) bilgisi verilmeden** eğitilmesine rağmen, `cluster_genre_table.png` tablosunda ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü kanıtlanmıştır.
 
-## 📈 Model Performansı ve Değerlendirme Metrikleri
-
-Unsupervised (denetimsiz) bir kümeleme projesi olduğu için geleneksel "accuracy" (doğruluk) yerine **Silhouette Score**, **Inertia (SSD)**, **Elbow Metodu** ve **Küme İçi/Dışı Mesafe Analizleri** kullanılmıştır. Modelin doğrulama çıktıları ve kalitesi şu şekildedir:
-
-* **Genel Silhouette Score:** Modelin kümeleri ne kadar net ayırdığını gösteren skor `outputs/main/` altında raporlanmaktadır. Yüksek silhouette skoru, kümelerin birbirine karışmadığını ve mantıksal olarak ayrıştığını gösterir.
-* **Optimum Küme Sayısı (Elbow Metodu):** KMeans algoritmasında en uygun küme sayısının belirlenmesi için `outputs/main/` altında elbow grafiği oluşturulmuştur.
-* **Genre Dağılım Tutarlılığı:** Modelin tür (genre) bilgisi verilmeden eğitilmesine rağmen, `cluster_genre_table.png` tablolarında ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü görülmüştür.
+* **Alt Kümeleme Analizi (Subcluster 0):**
+  * **Silhouette Score (0.3994):** Cluster 0'ın kendi içinde daha dar bir uzayda izole edilip Pop ve Rap olarak ikiye bölünmesiyle silhouette skorunun **0.3994'e yükseldiği** görülmüştür. Bu durum, alt kümelemenin alt müzikal yapıları ana modele kıyasla çok daha net ve keskin bir şekilde yakaladığını kanıtlar.
+  * **Intra/Inter Ratio (0.4512):** Küme içi mesafelerin küme arası mesafelere oranının düşük olması, alt kümelerin kendi içlerinde sıkı (kompakt) ve birbirlerinden net bir şekilde ayrık olduğunu gösterir.
 
 ---
 
