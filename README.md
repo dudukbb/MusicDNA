@@ -256,18 +256,31 @@ Unsupervised (denetimsiz) bir kümeleme projesi olduğu için geleneksel "accura
 
 ---
 
+## 📈 Model Performansı ve Değerlendirme Metrikleri
+
+Unsupervised (denetimsiz) bir kümeleme projesi olduğu için geleneksel "accuracy" (doğruluk) yerine **Silhouette Score**, **Inertia (SSD)**, **Elbow Metodu** ve **Küme İçi/Dışı Mesafe Analizleri** kullanılmıştır. Modelin doğrulama çıktıları ve kalitesi şu şekildedir:
+
+* **Genel Silhouette Score:** Modelin kümeleri ne kadar net ayırdığını gösteren skor `outputs/main/` altında raporlanmaktadır. Yüksek silhouette skoru, kümelerin birbirine karışmadığını ve mantıksal olarak ayrıştığını gösterir.
+* **Optimum Küme Sayısı (Elbow Metodu):** KMeans algoritmasında en uygun küme sayısının belirlenmesi için `outputs/main/` altında elbow grafiği oluşturulmuştur.
+* **Genre Dağılım Tutarlılığı:** Modelin tür (genre) bilgisi verilmeden eğitilmesine rağmen, `cluster_genre_table.png` tablolarında ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü görülmüştür.
+
+---
+
 ### 📊 Çıktı Görselleri ve Dağılımlar
 
-Proje kapsamında elde edilen nicel metrikler, kümeleme kalitesi grafikleri ve alt kümeleme analizleri `outputs/` dizini altında saklanmaktadır.
+Proje kapsamında elde edilen nicel metrikler, kümeleme kalitesi grafikleri ve alt kümeleme analizleri `outputs/` dizini altında saklanmaktadır[cite: 3].
 
 #### 1. Ana Kümeleme Sonuçları (`outputs/main/`)
-Ana modelin dağılımı, silhouette skorları ve küme merkezleri arasındaki mesafeler:
+Ana modelin dağılımı, silhouette skorları, elbow analizi ve küme merkezleri arasındaki mesafeler[cite: 3, 4]:
 
 * **PCA Küme Dağılımı (`pca_clusters.png`)**:
 <img src="outputs/main/pca_clusters.png" width="700">
 
 * **Silhouette Analizi (`silhouette_hist.png`)**:
 <img src="outputs/main/silhouette_hist.png" width="700">
+
+* **Elbow Grafiği (`elbow_plot.png`)**:
+<img src="outputs/main/elbow_plot.png" width="700">
 
 * **Küme Mesafeleri (`distance_hist.png`)**:
 <img src="outputs/main/distance_hist.png" width="700">
@@ -276,7 +289,7 @@ Ana modelin dağılımı, silhouette skorları ve küme merkezleri arasındaki m
 <img src="outputs/main/cluster_genre_table.png" width="700">
 
 #### 2. Alt Kümeleme Analizi - Cluster 0 (`outputs/subcluster0/`)
-Cluster 0'ın kendi içindeki alt müzikal yapıların (ör. Pop / Rap) ayrışmasını incelemek için yapılan alt kümeleme çıktısı:
+Cluster 0'ın kendi içindeki alt müzikal yapıların ayrışmasını incelemek için yapılan alt kümeleme çıktıları[cite: 3, 5]:
 
 * **Alt Küme PCA Dağılımı (`pca_subclusters.png`)**:
 <img src="outputs/subcluster0/pca_subclusters.png" width="700">
@@ -284,5 +297,8 @@ Cluster 0'ın kendi içindeki alt müzikal yapıların (ör. Pop / Rap) ayrışm
 * **Alt Küme Silhouette Grafiği (`silhouette_hist.png`)**:
 <img src="outputs/subcluster0/silhouette_hist.png" width="700">
 
-* **Elbow Grafiği (`elbow_plot.png`)**:
-<img src="outputs/subcluster0/elbow_plot.png" width="700">
+* **Alt Küme Mesafeleri (`distance_hist.png`)**:
+<img src="outputs/subcluster0/distance_hist.png" width="700">
+
+* **Alt Küme x Genre Tablosu (`subcluster_genre_table.png`)**:
+<img src="outputs/subcluster0/subcluster_genre_table.png" width="700">
