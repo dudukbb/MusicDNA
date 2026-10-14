@@ -257,11 +257,16 @@ Müzik verileri doğası gereği oldukça **gürültülü (noisy)**, heterojen v
   * **Silhouette Score (0.2877):** Binlerce şarkıdan oluşan gürültülü Spotify veri setinde, kümelerin birbirine tamamen karışmadığını ve mantıksal bir ayrışma sergilediğini doğrular.
   * **Calinski-Harabasz (8542.92) & Davies-Bouldin (1.9384):** Küme içi yoğunluğun ve kümeler arası ayrımın optimal düzeyde olduğunu gösterir.
   * **Genre Dağılım Tutarlılığı:** Model **hiçbir şekilde tür (genre) bilgisi verilmeden** eğitilmesine rağmen, `cluster_genre_table.png` tablosunda ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü kanıtlanmıştır.
+  * 
+ * **Main Cluster metrikler (`metrics_summary.png`)**:
+ <img src="outputs/main/metrics_summary.png" width="700">
 
 * **Alt Kümeleme Analizi (Subcluster 0):**
   * **Silhouette Score (0.3994):** Cluster 0'ın kendi içinde daha dar bir uzayda izole edilip Pop ve Rap olarak ikiye bölünmesiyle silhouette skorunun **0.3994'e yükseldiği** görülmüştür. Bu durum, alt kümelemenin alt müzikal yapıları ana modele kıyasla çok daha net ve keskin bir şekilde yakaladığını kanıtlar.
   * **Intra/Inter Ratio (0.4512):** Küme içi mesafelerin küme arası mesafelere oranının düşük olması, alt kümelerin kendi içlerinde sıkı (kompakt) ve birbirlerinden net bir şekilde ayrık olduğunu gösterir.
 
+* **Subcluster0 metrikler (`metrics_summary.png`)**:
+<img src="outputs/subcluster0/metrics_summary.png" width="700">
 ---
 
 ### 📊 Çıktı Görselleri ve Dağılımlar
@@ -269,7 +274,7 @@ Müzik verileri doğası gereği oldukça **gürültülü (noisy)**, heterojen v
 Proje kapsamında elde edilen nicel metrikler, kümeleme kalitesi grafikleri ve alt kümeleme analizleri `outputs/` dizini altında saklanmaktadır[cite: 3].
 
 #### 1. Ana Kümeleme Sonuçları (`outputs/main/`)
-Ana modelin dağılımı, silhouette skorları, elbow analizi ve küme merkezleri arasındaki mesafeler[cite: 3, 4]:
+Ana modelin dağılımı, silhouette skorları, elbow analizi ve küme merkezleri arasındaki mesafeler:
 
 * **PCA Küme Dağılımı (`pca_clusters.png`)**:
 <img src="outputs/main/pca_clusters.png" width="700">
