@@ -247,3 +247,42 @@ Aşağıdaki adımlar **belirtilen sırayla** çalıştırılmalıdır.
 **Ne elde edilir?**
 - Çalışan MusicDNA web arayüzü
 
+## 📈 Model Performansı ve Değerlendirme Metrikleri
+
+Unsupervised (denetimsiz) bir kümeleme projesi olduğu için geleneksel "accuracy" (doğruluk) yerine **Silhouette Score**, **Inertia (SSD)** ve **Küme İçi/Dışı Mesafe Analizleri** kullanılmıştır. Modelin doğrulama çıktıları ve kalitesi şu şekildedir:
+
+* **Genel Silhouette Score:** Modelin kümeleri ne kadar net ayırdığını gösteren skor `outputs/main/` altında raporlanmaktadır. Yüksek silhouette skoru, kümelerin birbirine karışmadığını ve mantıksal olarak ayrıştığını gösterir.
+* **Genre Dağılım Tutarlılığı:** Modelin tür (genre) bilgisi verilmeden eğitilmesine rağmen, `cluster_genre_table.png` tablosunda ortaya çıkan kümelerin belirli müzik türleriyle yüksek oranda örtüştüğü görülmüştür.
+
+---
+
+### 📊 Çıktı Görselleri ve Dağılımlar
+
+Proje kapsamında elde edilen nicel metrikler, kümeleme kalitesi grafikleri ve alt kümeleme analizleri `outputs/` dizini altında saklanmaktadır.
+
+#### 1. Ana Kümeleme Sonuçları (`outputs/main/`)
+Ana modelin dağılımı, silhouette skorları ve küme merkezleri arasındaki mesafeler:
+
+* **PCA Küme Dağılımı (`pca_clusters.png`)**:
+<img src="outputs/main/pca_clusters.png" width="700">
+
+* **Silhouette Analizi (`silhouette_hist.png`)**:
+<img src="outputs/main/silhouette_hist.png" width="700">
+
+* **Küme Mesafeleri (`distance_hist.png`)**:
+<img src="outputs/main/distance_hist.png" width="700">
+
+* **Küme x Genre Dağılım Tablosu (`cluster_genre_table.png`)**:
+<img src="outputs/main/cluster_genre_table.png" width="700">
+
+#### 2. Alt Kümeleme Analizi - Cluster 0 (`outputs/subcluster0/`)
+Cluster 0'ın kendi içindeki alt müzikal yapıların (ör. Pop / Rap) ayrışmasını incelemek için yapılan alt kümeleme çıktısı:
+
+* **Alt Küme PCA Dağılımı (`pca_subclusters.png`)**:
+<img src="outputs/subcluster0/pca_subclusters.png" width="700">
+
+* **Alt Küme Silhouette Grafiği (`silhouette_hist.png`)**:
+<img src="outputs/subcluster0/silhouette_hist.png" width="700">
+
+* **Elbow Grafiği (`elbow_plot.png`)**:
+<img src="outputs/subcluster0/elbow_plot.png" width="700">
