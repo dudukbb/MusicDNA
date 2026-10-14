@@ -5,7 +5,7 @@
 Proje kapsamında **PCA + KMeans** yaklaşımı kullanılarak, şarkılar doğal kümelere ayrılmış ve bu kümeler **yorumlanabilir müzik kişilikleri** olarak anlamlandırılmıştır.
 
 ---
- ## Live Demo :** [[MusicDNA Web App](https://musicdna.streamlit.app)](https://musicdna-xg2yglgjaedaurk9dnainh.streamlit.app/)
+ ## Live Demo :**[(https://musicdna-xg2yglgjaedaurk9dnainh.streamlit.app/)](https://musicdna-xg2yglgjaedaurk9dnainh.streamlit.app/)
 
 ## 📌 Proje Genel Bakışı
 
